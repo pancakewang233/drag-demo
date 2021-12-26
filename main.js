@@ -1,8 +1,10 @@
 const idioms = ["诗情画意", "南来北往", "一团和气", "落花流水"];
 const oCharCellGroup = document.querySelector(".char-cell-group");
+const oBlankCellGroup = document.querySelector(".blank-cell-group");
 const oBlanks = document.querySelectorAll(".blank-cell-group .wrapper");
 
 let charList = [];
+let blankList = ["", "", "", ""];
 let charAreas = [];
 let blankAreas = [];
 let oChars = null;
@@ -29,6 +31,14 @@ function randomSort(a, b) {
   return Math.random() > 0.5 ? -1 : 1;
 }
 
+function blankCell(value, index) {
+  return `
+    <div class="cell-item">
+        <div class="wrapper" data-index="${index}"></div>
+    </div>
+  `;
+}
+
 function charCellTpl(char, index) {
   return `
     <div class="cell-item">
@@ -38,13 +48,18 @@ function charCellTpl(char, index) {
 }
 
 function render() {
-  let list = "";
+  let clist = "";
+  let blist = "";
   charList.map((char, index) => {
-    list += charCellTpl(char, index);
+    clist += charCellTpl(char, index);
     return char;
   });
-
-  oCharCellGroup.innerHTML = list;
+  blankList.map((item, index) => {
+    blist += blankCell(item, index);
+    return item;
+  });
+  oBlankCellGroup.innerHTML = blist;
+  oCharCellGroup.innerHTML = clist;
 }
 
 function bindEvent() {
