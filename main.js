@@ -4,7 +4,7 @@ const oBlankCellGroup = document.querySelector(".blank-cell-group");
 
 let charList = [];
 let blankList = ["", "", "", ""];
-let resArr = [];
+let resArr = [undefined, undefined, undefined, undefined];
 let charAreas = [];
 let blankAreas = [];
 let oChars = null;
@@ -15,8 +15,8 @@ let cellX = 0;
 let cellY = 0;
 let cellW = 0;
 let cellH = 0;
-mouseX = 0;
-mouseY = 0;
+let mouseX = 0;
+let mouseY = 0;
 
 function formatCharsArr() {
   let arr = [];
@@ -98,8 +98,7 @@ function handleTouchMove(e) {
   cellX = moveX - mouseX;
   cellY = moveY - mouseY;
 
-  this.style.left = cellX / 10 + "rem";
-  this.style.top = cellY / 10 + "rem";
+  setPosition(this, { startX: cellX, startY: cellY });
 }
 
 function getAreas(domList, arrWrapper) {
@@ -139,20 +138,62 @@ function handleTouchEnd(e) {
         cellY < startY + blankHeight / 2)
     ) {
       setPosition(this, { startX, startY });
+      setResArr(this, i);
+
+      if (!resArr.includes(undefined)) {
+        setTimeout(() => {
+          if (checkResult()) {
+            alert("正确");
+          } else {
+            alert("错了");
+          }
+          resetPosition();
+        }, 1000);
+      }
       return;
     }
   }
 
   const _index = Number(this.dataset.index);
   let charArea = charAreas[_index];
-  console.log("fuck", _index, charAreas[_index]);
-  this.style.left = charArea.startX / 10 + "rem";
-  this.style.top = charArea.startY / 10 + "rem";
+
+  setPosition(this, { ...charArea });
 }
 
 function setPosition(el, { startX, startY }) {
   el.style.left = startX / 10 + "rem";
   el.style.top = startY / 10 + "rem";
+}
+
+function resetPosition() {
+  resArr.map((item) => {
+    const el = item.el;
+    const index = el.dataset.index;
+    let { startX, startY } = charAreas[index];
+
+    setPosition(el, { ...charAreas[index] });
+
+    resArr = [];
+    startX = 0;
+    startY = 0;
+    cellX = 0;
+    cellY = 0;
+    return item;
+  });
+}
+
+function setResArr(el, index) {
+  resArr[index] = {
+    char: el.innerText,
+    el,
+  };
+}
+
+function checkResult() {
+  let idiom = "";
+  resArr.map((item) => (idiom += item.char));
+
+  return idioms.find((item) => item === idiom);
 }
 
 const init = () => {
