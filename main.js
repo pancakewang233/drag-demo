@@ -1,13 +1,14 @@
 const idioms = ["诗情画意", "南来北往", "一团和气", "落花流水"];
 const oCharCellGroup = document.querySelector(".char-cell-group");
 const oBlankCellGroup = document.querySelector(".blank-cell-group");
-const oBlanks = document.querySelectorAll(".blank-cell-group .wrapper");
 
 let charList = [];
 let blankList = ["", "", "", ""];
+let resArr = [];
 let charAreas = [];
 let blankAreas = [];
 let oChars = null;
+let oBlanks = null;
 let startX = 0;
 let startY = 0;
 let cellX = 0;
@@ -119,10 +120,39 @@ function getAreas(domList, arrWrapper) {
 }
 
 function handleTouchEnd(e) {
+  const blankWidth = oBlanks[0].offsetWidth;
+  const blankHeight = oBlanks[0].offsetHeight;
+  for (let i = 0; i < blankAreas.length; i++) {
+    if (resArr[i] !== undefined) {
+      continue;
+    }
+    let { startX, startY } = blankAreas[i];
+
+    if (
+      (cellX > startX &&
+        cellX < startX + blankWidth / 2 &&
+        cellY > startY &&
+        cellY < startY + blankHeight / 2) ||
+      (cellX + blankWidth > startX + blankWidth / 2 &&
+        cellX + blankWidth < startX + blankWidth &&
+        cellY > startY &&
+        cellY < startY + blankHeight / 2)
+    ) {
+      setPosition(this, { startX, startY });
+      return;
+    }
+  }
+
   const _index = Number(this.dataset.index);
   let charArea = charAreas[_index];
+  console.log("fuck", _index, charAreas[_index]);
   this.style.left = charArea.startX / 10 + "rem";
   this.style.top = charArea.startY / 10 + "rem";
+}
+
+function setPosition(el, { startX, startY }) {
+  el.style.left = startX / 10 + "rem";
+  el.style.top = startY / 10 + "rem";
 }
 
 const init = () => {
@@ -130,6 +160,7 @@ const init = () => {
   render();
 
   oChars = oCharCellGroup.querySelectorAll(".cell-item .wrapper");
+  oBlanks = oBlankCellGroup.querySelectorAll(".cell-item .wrapper");
   getAreas(oBlanks, blankAreas);
   getAreas(oChars, charAreas);
   bindEvent();
